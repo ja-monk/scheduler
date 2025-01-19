@@ -7,7 +7,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
-@Entity
+@Entity     // annotation to show this is mapped to a DB table
 @Table(name = "jobs")
 public class Job {
 
@@ -26,9 +26,7 @@ public class Job {
     }
 
     // default constructor, required by Hibernate, Jackson, etc.
-    public Job() {
-
-    }
+    public Job() {}
 
     public String getName() {
         return this.name;
@@ -42,6 +40,7 @@ public class Job {
         return this.id;
     }
 
+    // remove? No reson to set id
     public void setId(int id) {
         this.id = id;
     }
