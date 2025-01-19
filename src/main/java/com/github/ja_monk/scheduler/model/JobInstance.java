@@ -22,7 +22,7 @@ public class JobInstance {
     @SequenceGenerator(name = "job_instance_seq_gen", sequenceName = "job_instance_seq", allocationSize = 1)
     private int id;
     private String jobName;
-    private LocalDateTime nextRunTime;
+    private LocalDateTime scheduledTime;
     @Enumerated(EnumType.STRING)    // store string value of status in DB
     private JobStatus status;
 
@@ -36,12 +36,12 @@ public class JobInstance {
         this.jobName = name;
     }
 
-    public LocalDateTime getNextRunTime() {
-        return this.nextRunTime;
+    public LocalDateTime getScheduledTime() {
+        return this.scheduledTime;
     }
 
-    public void setNextRunTime(LocalDateTime time) {
-        this.nextRunTime = time;
+    public void setScheduledTime(LocalDateTime time) {
+        this.scheduledTime = time;
     }
 
     public JobStatus getJobStatus() {

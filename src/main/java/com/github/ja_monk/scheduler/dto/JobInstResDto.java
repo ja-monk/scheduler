@@ -8,13 +8,13 @@ import com.github.ja_monk.scheduler.model.JobInstance;
 public class JobInstResDto {
     private int id;
     private String name;
-    private LocalDateTime nextRunTime;
+    private LocalDateTime scheduledTime;
     private JobStatus status;
     
     public JobInstResDto(JobInstance jobInstance) {
         this.id = jobInstance.getId();
         this.name = jobInstance.getJobName();
-        this.nextRunTime = jobInstance.getNextRunTime();
+        this.scheduledTime = jobInstance.getScheduledTime();
         this.status = jobInstance.getJobStatus();
     }
 
@@ -26,8 +26,8 @@ public class JobInstResDto {
         return this.name;
     }
 
-    public LocalDateTime nextRunTime() {
-        return this.nextRunTime;
+    public LocalDateTime getScheduledTime() {
+        return this.scheduledTime;
     }
 
     public JobStatus getStatus() {

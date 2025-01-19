@@ -22,6 +22,7 @@ public class JobInstanceService {
     public JobInstResDto submitJob(JobInstReqDto jobInstReqDto) {
         JobInstance jobInstance = new JobInstance();
         jobInstance.setJobName(jobInstReqDto.getName());
+        jobInstance.setScheduledTime(jobInstReqDto.getScheduledTime());
         jobInstance.setJobStatus(JobStatus.WAITING);
         
         jobInstRepo.save(jobInstance);

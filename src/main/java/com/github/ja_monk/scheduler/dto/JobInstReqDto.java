@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 public class JobInstReqDto {
     private String name;
-    private LocalDateTime nextRunTime;
+    private LocalDateTime scheduledTime;  // can be converted from string format like 2025-01-01T13:45
 
     public String getName() {
         return this.name;
@@ -14,11 +14,11 @@ public class JobInstReqDto {
         this.name = name;
     }
 
-    public LocalDateTime getNextRunTime() {
-        return this.nextRunTime;
+    public LocalDateTime getScheduledTime() {
+        return this.scheduledTime;
     }
 
-    public void setNextRunTime(LocalDateTime time) {
-        this.nextRunTime = time;
+    public void setScheduledTime(LocalDateTime time) {
+        this.scheduledTime = time;
     }
 }
