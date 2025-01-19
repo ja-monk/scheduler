@@ -47,6 +47,14 @@ public class JobService {
         return jobResDto;
     }
 
+    public JobResDto findJob(String name) {
+        // find job or throw default exception if no job found
+        Job job = jobRepo.findByName(name).orElseThrow();
+        JobResDto jobResDto = new JobResDto(job);
+        
+        return jobResDto;
+    }
+
     public JobResDto updateJob(JobReqDto jobReqDto) {
         Iterable<Job> jobs = jobRepo.findAll();
         
@@ -65,5 +73,7 @@ public class JobService {
     public void deleteJob(int id) {
         jobRepo.deleteById(id);
     }
+
+
 
 }

@@ -36,10 +36,17 @@ public class JobController {
         return allJobs;
     }
 
-    @GetMapping("/job/{id}")
+    @GetMapping("/job/id/{id}")
     public JobResDto getJobInfo(@PathVariable("id") int id) {
         JobResDto jobResDto = jobService.findJob(id);
         
+        return jobResDto;
+    }
+
+    @GetMapping("/job/name/{name}")
+    public JobResDto getJobInfo(@PathVariable("name") String name) {
+        JobResDto jobResDto = jobService.findJob(name);
+
         return jobResDto;
     }
 
