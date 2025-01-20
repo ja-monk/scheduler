@@ -21,6 +21,9 @@ public class JobRunnerService {
     @Autowired
     private JobInstanceRepository jobInstRepo;
 
+    // TODO: add method to find and wait for next job, synch(lock) & restart
+    // if new job added with lock.wait(time) & restart trigger method
+
     
     public void runJob(JobInstance jobInstance, String definition) {
         // define the process builder to run the job 
