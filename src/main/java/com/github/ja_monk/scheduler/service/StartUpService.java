@@ -12,11 +12,6 @@ public class StartUpService {
 
     @PostConstruct  // PostConstuct tag runs this method on app start
     public void startJobRunnerService() throws InterruptedException {
-        System.out.println("""
-                **************8
-                calling job runner
-                ******************
-                """);
         jobRunnerService.jobRunner();
     }
 }
