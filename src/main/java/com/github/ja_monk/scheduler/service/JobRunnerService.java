@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.github.ja_monk.scheduler.dto.JobResDto;
@@ -14,13 +15,11 @@ import com.github.ja_monk.scheduler.enums.Enums.JobStatus;
 import com.github.ja_monk.scheduler.model.JobInstance;
 import com.github.ja_monk.scheduler.repository.JobInstanceRepository;
 
-import jakarta.annotation.PostConstruct;
-
 @Service
 public class JobRunnerService {
     // generic obbject to be used as lock for synchronization
     // when lock is held in by synchronized(lock) it needs to be released
-    // before another method can run blokc with the same lock
+    // before another method can run block with the same lock
     private final Object lock = new Object();
     private boolean restart;
     @Autowired
@@ -28,7 +27,7 @@ public class JobRunnerService {
     @Autowired
     private JobService jobService;
 
-    @PostConstruct  // PostConstuct tag runs this method on app start
+    @Async          // run this method in a separate thread (otherwise rest of app is blocked by the wait)
     public void jobRunner() throws InterruptedException {    // TODO: Handle interupted exception?
         // Start while true loop as we want job runner to always be running
         while (true) {
@@ -40,7 +39,7 @@ public class JobRunnerService {
                 ArrayList<JobInstance> nextJobsList = jobInstRepo.findNextScheduledJobs();
 
                 // if no jobs scheduled and waiting, then wait for a new job
-                if (nextJobsList.isEmpty()) {
+                if (nextJobsList.isEmpty()) { 
                     lock.wait();
                     continue;   // wait is interupted when notified, we want to redo the check for jobs to run
                 }
@@ -73,6 +72,14 @@ public class JobRunnerService {
                     runJob(jobInstance);
                 }
             }
+        }
+    }
+
+    public void recheckNextJob() {
+        synchronized(lock) {
+            // set restart to true so jobRunner restarts
+            restart = true;
+            lock.notify();
         }
     }
 
