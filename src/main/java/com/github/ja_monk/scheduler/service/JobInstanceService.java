@@ -3,7 +3,10 @@ package com.github.ja_monk.scheduler.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Array;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.NoSuchElementException;
 
 import com.github.ja_monk.scheduler.dto.JobInstReqDto;
 import com.github.ja_monk.scheduler.dto.JobInstResDto;
@@ -23,8 +26,12 @@ public class JobInstanceService {
 
     public JobInstResDto submitJob(JobInstReqDto jobInstReqDto) {
         // check job exists
-        JobResDto jobResDto = jobService.findJob(jobInstReqDto.getName()); 
-        String jobDefinition = jobResDto.getDefinition();
+        try {
+            jobService.findJob(jobInstReqDto.getName()); 
+        } catch (NoSuchElementException e) {
+            // TODO: how to handle better
+            throw e;    
+        }
 
         // create job instance entry in DB
         JobInstance jobInstance = new JobInstance();
@@ -34,16 +41,33 @@ public class JobInstanceService {
         
         jobInstRepo.save(jobInstance);
         
-        if (jobInstReqDto.getScheduledTime().isBefore(LocalDateTime.now())) {
-            jobRunner.runJob(jobInstance, jobDefinition);
-        }
-
         JobInstResDto jobInstResDto = new JobInstResDto(jobInstance);
-        return jobInstResDto;
 
+        // TODO: Pointless??
+        /*
+        if (jobInstReqDto.getScheduledTime().isBefore(LocalDateTime.now())) {
+            jobRunner.runJob(jobInstResDto);
+        }
+        
         // TODO: restart job runner waiting for next job
+        */
 
+        return jobInstResDto;
     }
- 
 
+    // TODO: Update, Delete, etc.
+    //public JobInstResDto updateJobInstance(JobInstReqDto jobInstReqDto) {}
+
+    // TODO: needed?
+/*
+    public ArrayList<JobInstResDto> findNextScheduledJobs() {
+        ArrayList<JobInstance> jobInstList = jobInstRepo.findNextScheduledJobs();
+        ArrayList<JobInstResDto> jobInstResDtoList = new ArrayList<>();
+        for (JobInstance jobInst : jobInstList) {
+            JobInstResDto jobInstResDto = new JobInstResDto(jobInst);
+            jobInstResDtoList.add(jobInstResDto);
+        }
+        return jobInstResDtoList;
+    } 
+*/
 }

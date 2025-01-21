@@ -56,6 +56,7 @@ public class JobService {
     }
 
     public JobResDto updateJob(JobReqDto jobReqDto) {
+        // TODO: Update to find by name
         Iterable<Job> jobs = jobRepo.findAll();
         
         for (Job job : jobs) {
