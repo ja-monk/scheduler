@@ -68,6 +68,7 @@ public class JobRunnerService {
                 }
                 
                 // if we came out of wait naturally, then time should now be scheduled time so we run jobs
+                // TODO: run jobs multithreaded 
                 for (JobInstance jobInstance : nextJobsList) {
                     runJob(jobInstance);
                 }
@@ -120,7 +121,6 @@ public class JobRunnerService {
         }
 
         jobInstRepo.save(jobInstance); 
-
     }    
 
 }
