@@ -18,7 +18,7 @@ public class JobInstanceService {
     @Autowired
     private JobService jobService;
     @Autowired
-    private JobRunnerService jobRunner;
+    private SchedulingService scheduler;
 
     public JobInstResDto submitJob(JobInstReqDto jobInstReqDto) {
         // check job exists
@@ -39,7 +39,7 @@ public class JobInstanceService {
         
         JobInstResDto jobInstResDto = new JobInstResDto(jobInstance);
  
-        jobRunner.recheckNextJob();
+        scheduler.recheckNextJob();
 
         return jobInstResDto;
     }

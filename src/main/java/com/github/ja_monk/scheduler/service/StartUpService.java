@@ -8,10 +8,10 @@ import jakarta.annotation.PostConstruct;
 @Component
 public class StartUpService {
     @Autowired
-    private JobRunnerService jobRunnerService;
+    private SchedulingService scheduler;
 
     @PostConstruct  // PostConstuct tag runs this method on app start
     public void startJobRunnerService() throws InterruptedException {
-        jobRunnerService.jobRunner();
+        scheduler.scheduleJobs();
     }
 }
