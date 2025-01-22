@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.scheduling.annotation.Async;
 
 import com.github.ja_monk.scheduler.dto.JobResDto;
 import com.github.ja_monk.scheduler.enums.Enums.JobStatus;
@@ -18,7 +19,14 @@ public class ExecutionService {
     @Autowired
     private JobInstanceRepository jobInstRepo;
     
-    public void runJob(JobInstance jobInstance) { // get job definition
+    @Async
+    public void runJob(JobInstance jobInstance) { 
+        // update status as we start process
+        // TODO: Better here but not quick enough, multiple versions of job kicked off 
+        // jobInstance.setJobStatus(JobStatus.RUNNING);
+        // jobInstRepo.save(jobInstance);
+        
+        // get job definition
         JobResDto jobResDto = jobService.findJob(jobInstance.getJobName()); 
         String jobDefinition = jobResDto.getDefinition();
 
@@ -29,10 +37,6 @@ public class ExecutionService {
         // capture stout & sterr
         procBuilder.redirectOutput(new File("logs/" + jobInstance.getJobName() + "_stdout.log"));
         procBuilder.redirectError(new File("logs/" + jobInstance.getJobName() + "_stderr.log"));
-
-        // update status as we start process
-        jobInstance.setJobStatus(JobStatus.RUNNING);
-        jobInstRepo.save(jobInstance);
 
         // run job
         try {
@@ -51,6 +55,7 @@ public class ExecutionService {
         } catch (InterruptedException e) {
             e.printStackTrace();
             // TODO: set status
+            jobInstance.setJobStatus(JobStatus.FAILED);
         }
 
         jobInstRepo.save(jobInstance); 
