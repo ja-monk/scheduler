@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import com.github.ja_monk.scheduler.enums.Enums.JobStatus;
 import com.github.ja_monk.scheduler.model.JobInstance;
 import com.github.ja_monk.scheduler.repository.JobInstanceRepository;
 
@@ -27,7 +28,7 @@ public class SchedulingService {
     @Async          // run this method in a separate thread (otherwise rest of app is blocked by the wait)
     public void scheduleJobs() throws InterruptedException {    // TODO: Handle interupted exception?
         // Start while true loop as we want job runner to always be running
-        while (true) {
+        while (true) {            
             restart = false;
             // synchronised with method that restarts the loop
             // any time a job is added/updated/etc, we restart the loop and check for next job to run
@@ -47,6 +48,8 @@ public class SchedulingService {
                 // TODO: run jobs multithreaded 
                 if (scheduledTime.isBefore(LocalDateTime.now())) {
                     for (JobInstance jobInstance : nextJobsList) {
+                        jobInstance.setJobStatus(JobStatus.RUNNING);
+                        jobInstRepo.save(jobInstance);
                         executor.runJob(jobInstance);
                     }
                     continue;
@@ -67,6 +70,8 @@ public class SchedulingService {
                 // if we came out of wait naturally, then time should now be scheduled time so we run jobs
                 // TODO: run jobs multithreaded 
                 for (JobInstance jobInstance : nextJobsList) {
+                    jobInstance.setJobStatus(JobStatus.RUNNING);
+                    jobInstRepo.save(jobInstance);
                     executor.runJob(jobInstance);
                 }
             }
