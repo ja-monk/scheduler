@@ -3,6 +3,8 @@ package com.github.ja_monk.scheduler.service;
 import java.io.File;
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.scheduling.annotation.Async;
@@ -14,6 +16,8 @@ import com.github.ja_monk.scheduler.repository.JobInstanceRepository;
 
 @Service
 public class ExecutionService {
+    private static final Logger log = LoggerFactory.getLogger(ExecutionService.class);
+
     @Autowired
     private JobService jobService;
     @Autowired
@@ -25,6 +29,8 @@ public class ExecutionService {
         // TODO: Better here but not quick enough, multiple versions of job kicked off 
         // jobInstance.setJobStatus(JobStatus.RUNNING);
         // jobInstRepo.save(jobInstance);
+        
+        log.info("Executing job: " + jobInstance.getJobName());
         
         // get job definition
         JobResDto jobResDto = jobService.findJob(jobInstance.getJobName()); 
@@ -46,6 +52,7 @@ public class ExecutionService {
             // update status based on error code
             if (exitCode == 0) {
                 jobInstance.setJobStatus(JobStatus.COMPLETE);
+                log.info(jobInstance.getJobName() + " complete.");
             } else {
                 jobInstance.setJobStatus(JobStatus.FAILED);
             }
