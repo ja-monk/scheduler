@@ -23,8 +23,12 @@ public class JobInstance {
     private int id;
     private String jobName;
     private LocalDateTime scheduledTime;
+
     @Enumerated(EnumType.STRING)    // store string value of status in DB
     private JobStatus status;
+
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
 
     public JobInstance() {}
 
@@ -52,8 +56,24 @@ public class JobInstance {
         this.status = status;
     }
 
-    public int getId() {
+    public int getId() {    // only need getter as id set by DB
         return this.id;
+    }
+
+    public LocalDateTime getStartTime() {
+        return this.startTime;
+    }
+
+    public void setStartTime(LocalDateTime starTime) {
+        this.startTime = starTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return this.endTime;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
     }
 
 }
