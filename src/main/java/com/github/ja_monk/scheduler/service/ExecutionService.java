@@ -2,6 +2,7 @@ package com.github.ja_monk.scheduler.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,11 +45,14 @@ public class ExecutionService {
         procBuilder.redirectOutput(new File("logs/" + jobInstance.getJobName() + "_stdout.log"));
         procBuilder.redirectError(new File("logs/" + jobInstance.getJobName() + "_stderr.log"));
 
-        // run job
+        // set start time & run job
+        jobInstance.setStartTime(LocalDateTime.now());
+        jobInstRepo.save(jobInstance);
         try {
             Process jobRun = procBuilder.start();
             int exitCode = jobRun.waitFor();
             
+            jobInstance.setEndTime(LocalDateTime.now());
             // update status based on error code
             if (exitCode == 0) {
                 jobInstance.setJobStatus(JobStatus.COMPLETE);
