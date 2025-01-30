@@ -10,5 +10,14 @@ public class Enums {
         FAILED
     }
 
+    public enum Repeat {
+        H,
+        D,
+        W,
+        M,
+        Y,
+        N
+    }
+
 }
 
