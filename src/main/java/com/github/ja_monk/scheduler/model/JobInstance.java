@@ -3,6 +3,7 @@ package com.github.ja_monk.scheduler.model;
 import java.time.LocalDateTime;
 
 import com.github.ja_monk.scheduler.enums.Enums.JobStatus;
+import com.github.ja_monk.scheduler.enums.Enums.Repeat;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -29,6 +30,9 @@ public class JobInstance {
 
     private LocalDateTime startTime;
     private LocalDateTime endTime;
+    
+    @Enumerated(EnumType.STRING)
+    private Repeat repeat;
 
     public JobInstance() {}
 
@@ -76,4 +80,11 @@ public class JobInstance {
         this.endTime = endTime;
     }
 
+    public Repeat getRepeat() {
+        return this.repeat;
+    }
+
+    public void setRepeat(Repeat repeat) {
+        this.repeat = repeat;
+    }
 }
