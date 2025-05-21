@@ -7,7 +7,9 @@ public class Enums {
         WAITING,
         RUNNING,
         COMPLETE,
-        FAILED
+        FAILED,
+        CANCELLED,
+        HELD
     }
 
     public enum Repeat {
