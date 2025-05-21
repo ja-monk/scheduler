@@ -69,10 +69,8 @@ public class SchedulingService {
                 if (scheduledTime.isBefore(LocalDateTime.now())) {
                     log.info("Identified jobs scheduled in the past - running these jobs.");
                     for (JobInstance jobInstance : nextJobsList) {
-                        jobInstance.setJobStatus(JobStatus.RUNNING);
-                        jobInstRepo.save(jobInstance);
-                        executor.runJob(jobInstance);
-                        
+                        executeJob(jobInstance);
+
                         if (jobInstance.getRepeat() != Repeat.N) {
                             submitRepeatJobs(jobInstance, scheduledTime);
                         } 
@@ -99,10 +97,9 @@ public class SchedulingService {
                 // if we came out of wait naturally, then time should now be scheduled time so we run jobs
                 for (JobInstance jobInstance : nextJobsList) {
                     log.info("Running jobs");
-                    jobInstance.setJobStatus(JobStatus.RUNNING);
-                    jobInstRepo.save(jobInstance);
-                    executor.runJob(jobInstance);
-                    
+
+                    executeJob(jobInstance);
+
                     if (jobInstance.getRepeat() != Repeat.N) {
                         submitRepeatJobs(jobInstance, scheduledTime);
                     } 
@@ -125,6 +122,12 @@ public class SchedulingService {
         repeatJob.setScheduledTime(repeatTime);
         
         jobInstRepo.save(repeatJob);
+    }
+
+    public void executeJob(JobInstance jobInstance) {
+        jobInstance.setJobStatus(JobStatus.RUNNING);
+        jobInstRepo.save(jobInstance);
+        executor.runJob(jobInstance);
     }
 
     public void recheckNextJob() {
