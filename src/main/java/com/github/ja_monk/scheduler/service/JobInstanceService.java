@@ -50,9 +50,9 @@ public class JobInstanceService {
         
         JobInstResDto jobInstResDto = new JobInstResDto(jobInstance);
         
-        log.info("New instance of " + jobInstResDto.getName() + " scheduled at " + 
-                jobInstResDto.getScheduledTime() + " with repeat " + jobInstResDto.getRepeat());
-
+        log.info("New instance of {} scheduled at {} with repeat {}", 
+                jobInstResDto.getName(), jobInstResDto.getScheduledTime(), jobInstResDto.getRepeat());
+        
         scheduler.recheckNextJob();
 
         return jobInstResDto;
@@ -77,6 +77,13 @@ public class JobInstanceService {
 
         scheduler.recheckNextJob();
         
+        return jobInstResDto;
+    }
+
+    public JobInstResDto findJobInstance(int id) {
+        // find job instance or throw excpetion if it doesnt exist
+        JobInstance jobInst = jobInstRepo.findById(id).orElseThrow();
+        JobInstResDto jobInstResDto = new JobInstResDto(jobInst);
         return jobInstResDto;
     }
 
