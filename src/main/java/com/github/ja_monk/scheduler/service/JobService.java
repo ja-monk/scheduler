@@ -50,8 +50,7 @@ public class JobService {
     public JobResDto findJob(String name) {
         // find job or throw default exception if no job found
         Job job = jobRepo.findByName(name).orElseThrow();
-        JobResDto jobResDto = new JobResDto(job);
-        
+        JobResDto jobResDto = new JobResDto(job); 
         return jobResDto;
     }
 
