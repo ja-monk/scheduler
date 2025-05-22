@@ -109,12 +109,18 @@ public class SchedulingService {
     }
 
     public void submitRepeatJobs(JobInstance currJobInstance, LocalDateTime scheduledTime) {
-        LocalDateTime repeatTime = scheduledTime.plus(
-            repeatDuration.get(
-                currJobInstance.getRepeat().toString()
-            )
-        );
-        
+        LocalDateTime repeatTime;
+        //TODO: update so time value in minutes is passed with T option
+        if (currJobInstance.getRepeat() == Repeat.T) {
+            repeatTime = scheduledTime.plus(Duration.ofMinutes(2));
+        } else {
+            repeatTime = scheduledTime.plus(
+                repeatDuration.get(
+                    currJobInstance.getRepeat().toString()
+                )
+            );
+        }
+
         JobInstance repeatJob = new JobInstance();
         repeatJob.setJobName(currJobInstance.getJobName());
         repeatJob.setRepeat(currJobInstance.getRepeat());
