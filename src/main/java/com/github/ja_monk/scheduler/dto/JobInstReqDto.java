@@ -8,6 +8,7 @@ public class JobInstReqDto {
     private String name;
     private LocalDateTime scheduledTime;  // can be converted from string format like 2025-01-01T13:45
     private Repeat repeat;
+    private int id;
 
     public String getName() {
         return this.name;
@@ -31,5 +32,13 @@ public class JobInstReqDto {
 
     public void setRepeat(Repeat repeat) {
         this.repeat = repeat;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getId() {
+        return this.id;
     }
 }

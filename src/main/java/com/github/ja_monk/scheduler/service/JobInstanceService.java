@@ -58,6 +58,28 @@ public class JobInstanceService {
         return jobInstResDto;
     }
 
+    public JobInstResDto cancelJob(int id) {
+        //confirm job instance exists
+        JobInstance jobInst;
+        try {
+            jobInst = jobInstRepo.findById(id).orElseThrow();
+        } catch (NoSuchElementException e) {
+            // TODO: handle exception 
+            throw e;
+        }
+
+        jobInst.setJobStatus(JobStatus.CANCELLED);
+        jobInstRepo.save(jobInst);
+
+        JobInstResDto jobInstResDto = new JobInstResDto(jobInst);
+
+        log.info("Job {} (ID {}) CANCELLED", jobInstResDto.getName(), id);
+
+        scheduler.recheckNextJob();
+        
+        return jobInstResDto;
+    }
+
     // TODO: Update, Delete, etc.
     //public JobInstResDto updateJobInstance(JobInstReqDto jobInstReqDto) {}
 

@@ -7,15 +7,19 @@ public class Enums {
         WAITING,
         RUNNING,
         COMPLETE,
-        FAILED
+        FAILED,
+        CANCELLED,
+        HELD
     }
 
+    // Hour, Day, Week, Month, Year, Time (supply time period to repeat in mins e.g. 15)
     public enum Repeat {
         H,
         D,
         W,
         M,
         Y,
+        T,
         N
     }
 

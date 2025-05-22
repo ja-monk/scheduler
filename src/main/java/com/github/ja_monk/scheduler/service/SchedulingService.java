@@ -2,7 +2,10 @@ package com.github.ja_monk.scheduler.service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.Period;
+import java.time.temporal.TemporalAmount;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -11,6 +14,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.github.ja_monk.scheduler.enums.Enums.JobStatus;
+import com.github.ja_monk.scheduler.enums.Enums.Repeat;
 import com.github.ja_monk.scheduler.model.JobInstance;
 import com.github.ja_monk.scheduler.repository.JobInstanceRepository;
 
@@ -27,6 +31,17 @@ public class SchedulingService {
     private JobInstanceRepository jobInstRepo;
     @Autowired
     private ExecutionService executor;
+    // initialise and define repeat hashmap, items added using static block 
+    private static HashMap<String, TemporalAmount> repeatDuration = new HashMap<>();
+    
+    static {
+        repeatDuration.put(Repeat.H.toString(), Duration.ofHours(1));
+        repeatDuration.put(Repeat.D.toString(), Period.ofDays(1));
+        repeatDuration.put(Repeat.W.toString(), Period.ofWeeks(1));
+        repeatDuration.put(Repeat.M.toString(), Period.ofMonths(1));
+        repeatDuration.put(Repeat.Y.toString(), Period.ofYears(1));
+    }
+
 
     @Async          // run this method in a separate thread (otherwise rest of app is blocked by the wait)
     public void scheduleJobs() throws InterruptedException {    // TODO: Handle interupted exception?
@@ -54,10 +69,13 @@ public class SchedulingService {
                 if (scheduledTime.isBefore(LocalDateTime.now())) {
                     log.info("Identified jobs scheduled in the past - running these jobs.");
                     for (JobInstance jobInstance : nextJobsList) {
-                        jobInstance.setJobStatus(JobStatus.RUNNING);
-                        jobInstRepo.save(jobInstance);
-                        executor.runJob(jobInstance);
+                        executeJob(jobInstance);
+
+                        if (jobInstance.getRepeat() != Repeat.N) {
+                            submitRepeatJobs(jobInstance, scheduledTime);
+                        } 
                     }
+
                     continue;
                 }
 
@@ -80,17 +98,48 @@ public class SchedulingService {
                 // TODO: run jobs multithreaded 
                 for (JobInstance jobInstance : nextJobsList) {
                     log.info("Running jobs");
-                    jobInstance.setJobStatus(JobStatus.RUNNING);
-                    jobInstRepo.save(jobInstance);
-                    executor.runJob(jobInstance);
+
+                    executeJob(jobInstance);
+
+                    if (jobInstance.getRepeat() != Repeat.N) {
+                        submitRepeatJobs(jobInstance, scheduledTime);
+                    } 
                 }
             }
         }
     }
 
+    public void submitRepeatJobs(JobInstance currJobInstance, LocalDateTime scheduledTime) {
+        LocalDateTime repeatTime;
+        //TODO: update so time value in minutes is passed with T option
+        if (currJobInstance.getRepeat() == Repeat.T) {
+            repeatTime = scheduledTime.plus(Duration.ofMinutes(2));
+        } else {
+            repeatTime = scheduledTime.plus(
+                repeatDuration.get(
+                    currJobInstance.getRepeat().toString()
+                )
+            );
+        }
+
+        JobInstance repeatJob = new JobInstance();
+        repeatJob.setJobName(currJobInstance.getJobName());
+        repeatJob.setRepeat(currJobInstance.getRepeat());
+        repeatJob.setJobStatus(JobStatus.WAITING);
+        repeatJob.setScheduledTime(repeatTime);
+        
+        jobInstRepo.save(repeatJob);
+    }
+
+    public void executeJob(JobInstance jobInstance) {
+        jobInstance.setJobStatus(JobStatus.RUNNING);
+        jobInstRepo.save(jobInstance);
+        executor.runJob(jobInstance);
+    }
+
     public void recheckNextJob() {
         synchronized(lock) {
-            // set restart to true so jobRunner restarts
+            // set restart to true so scheduleJobs restarts
             restart = true;
             lock.notify();
         }
