@@ -3,6 +3,7 @@ package com.github.ja_monk.scheduler.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
 import org.slf4j.LoggerFactory;
@@ -78,6 +79,43 @@ public class JobInstanceService {
         scheduler.recheckNextJob();
         
         return jobInstResDto;
+    }
+
+    public ArrayList<JobInstResDto> cancelAllJobs() {
+        ArrayList<JobInstance> scheduledJobs = jobInstRepo.findAllScheduledJobs();
+        ArrayList<JobInstResDto> cancelledJobs = new ArrayList<>();
+
+        if (scheduledJobs.isEmpty()) {
+            return cancelledJobs;
+        }
+        
+        for (JobInstance jobInst : scheduledJobs) {
+            jobInst.setJobStatus(JobStatus.CANCELLED);
+            jobInstRepo.save(jobInst);
+            JobInstResDto jobInstResDto = new JobInstResDto(jobInst);
+            log.info("Job {} (ID {}) CANCELLED", jobInstResDto.getName(), jobInstResDto.getId());
+            cancelledJobs.add(jobInstResDto);
+        }
+
+        scheduler.recheckNextJob();
+
+        return cancelledJobs;
+    }
+
+    public ArrayList<JobInstResDto> getAllScheduledJobs() {
+        ArrayList<JobInstance> scheduledJobInsts = jobInstRepo.findAllScheduledJobs();
+        ArrayList<JobInstResDto> scheduledJobsRes = new ArrayList<>();
+
+        if (scheduledJobInsts.isEmpty()) {
+            return scheduledJobsRes;
+        }
+
+        for (JobInstance jobInst : scheduledJobInsts) {
+            JobInstResDto jobInstResDto = new JobInstResDto(jobInst);
+            scheduledJobsRes.add(jobInstResDto);
+        }
+
+        return scheduledJobsRes;
     }
 
     public JobInstResDto findJobInstance(int id) {

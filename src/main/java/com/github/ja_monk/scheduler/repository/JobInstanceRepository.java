@@ -14,15 +14,24 @@ public interface JobInstanceRepository extends CrudRepository<JobInstance, Integ
 
     @Query(
         value = """
-            select * from job_instances
-            where status = 'WAITING'
-            and scheduled_time = (
-                select min(job_instances.scheduled_time) 
-                from job_instances
-                where status = 'WAITING')
-            """, 
+                select * from job_instances
+                where status = 'WAITING'
+                and scheduled_time = (
+                    select min(job_instances.scheduled_time) 
+                    from job_instances
+                    where status = 'WAITING')
+                """, 
         nativeQuery = true
     )
     public ArrayList<JobInstance> findNextScheduledJobs();
 
+    @Query(
+        value = """
+                select * from job_instances
+                where status = 'WAITING'
+                or status = 'HELD'
+                """,
+        nativeQuery = true
+    )
+    public ArrayList<JobInstance> findAllScheduledJobs();
 }
